@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naraya Rain - Catch the Refreshment!</title>
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="score-panel">
+                <h3>Score</h3>
+                <div class="score-value" id="currentScore">0</div>
+                <div class="power-ups-display" id="powerUpsDisplay"></div>
+            </div>
+            <div class="timer-panel">
+                <div class="timer-value" id="timeLeft">30</div>
+            </div>
+        </div>
+
+        <div class="combo-indicator" id="comboIndicator"></div>
+        <div class="power-up-indicator" id="powerUpIndicator"></div>
+
+        <div class="start-screen" id="startScreen">
+            <div class="start-content">
+                <h1 class="game-title">NARAYA RAIN</h1>
+                <p class="game-subtitle">Catch the Refreshment!</p>
+                
+                <div class="instructions">
+                    <h3>How to Play</h3>
+                    <ul>
+                        <li>Move basket with ← → arrow keys or mouse</li>
+                        <li>Catch Naraya cans for points (10 pts)</li>
+                        <li>Golden cans are worth 50 points!</li>
+                        <li>Avoid competitor products (-20 pts)</li>
+                        <li>Catch 3+ in a row for combo bonus!</li>
+                        <li>Survive 30 seconds for maximum score!</li>
+                    </ul>
+                </div>
+                
+                <button class="btn" onclick="startGame()">START GAME</button>
+                <button class="btn" onclick="toggleLeaderboard()">VIEW SCORES</button>
+                <button class="btn" onclick="adminReset()" style="font-size: 12px; padding: 8px 15px; background: #8B0000; color: white; border: 2px solid #FFD700; margin-top: 20px;">ADMIN RESET</button>
+            </div>
+        </div>
+
+        <div class="game-over-screen" id="gameOverScreen">
+            <div class="game-over-content">
+                <h2>Game Over!</h2>
+                <div class="final-score" id="finalScore">0</div>
+                <p id="performanceMessage">Great job!</p>
+                <input type="text" class="name-input" id="playerName" placeholder="Enter your name" maxlength="20">
+                <div>
+                    <button class="btn" onclick="saveScore()">SAVE & VIEW SCORES</button>
+                    <button class="btn" onclick="playAgain()">PLAY AGAIN</button>
+                    <button class="btn" onclick="discardAndRestart()" id="discardBtn" style="display: none; background: #8B0000; color: white;">DON'T SAVE - RESTART</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="leaderboard" id="leaderboard" style="display: none;">
+            <h3>🏆 TOP 10 HIGH SCORES 🏆</h3>
+            <div id="leaderboardList"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="btn" onclick="startGame()" style="font-size: 16px; padding: 12px 25px; margin: 5px;">START GAME</button>
+                <button class="btn" onclick="closeLeaderboard()" style="font-size: 14px; padding: 10px 20px; margin: 5px;">BACK TO MENU</button>
+                <button class="btn" onclick="adminReset()" style="font-size: 12px; padding: 8px 15px; background: #8B0000; color: white; border: 2px solid #FFD700; margin: 5px;">ADMIN RESET</button>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <button class="reset-btn" onclick="resetLeaderboard()" style="display: none;">Reset Scores</button>
+        </div>
+    </div>
+
+    <!-- JavaScript modules -->
+    <script src="js/config.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/items.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/game-engine.js"></script>
+    <script src="js/leaderboard.js"></script>
+</body>
+</html>

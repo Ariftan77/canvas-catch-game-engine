@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naraya Rain - Catch the Refreshment!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            color: white;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            border: 3px solid #FFD700;
+            border-radius: 10px;
+            background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .score-panel {
+            background: rgba(0,0,0,0.8);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+        }
+
+        .score-panel h3 {
+            color: #FFD700;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .timer-panel {
+            background: rgba(220, 20, 60, 0.9);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+            text-align: center;
+        }
+
+        .timer-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .game-over-content {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #FFD700;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #FFD700;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .btn {
+            background: #FFD700;
+            color: #8B0000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .btn:hover {
+            background: #FFA500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+        }
+
+        .start-content {
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .game-title {
+            font-size: 48px;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+        }
+
+        .game-subtitle {
+            font-size: 24px;
+            color: #DC143C;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid #FFD700;
+        }
+
+        .instructions h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+            font-size: 16px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .instructions li:before {
+            content: "🥤";
+            position: absolute;
+            left: 0;
+        }
+
+        .leaderboard {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #FFD700;
+            min-width: 400px;
+            max-width: 500px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 250;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .leaderboard h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-size: 14px;
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            color: #FFD700;
+            font-weight: bold;
+            width: 30px;
+        }
+
+        .player-name {
+            flex: 1;
+            margin: 0 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-score {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .admin-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 150;
+        }
+
+        .reset-btn {
+            background: #8B0000;
+            color: white;
+            border: 1px solid #FFD700;
+            padding: 10px 15px;
+            font-size: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .combo-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 150;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .power-up-indicator {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.9);
+            color: #8B0000;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 150;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .power-ups-display {
+            margin-top: 10px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .power-up-item {
+            color: #FFD700;
+            margin: 2px 0;
+            font-weight: bold;
+        }
+
+        .power-up-item.speed {
+            color: #00FFFF;
+        }
+
+        .power-up-item.multiplier {
+            color: #FF69B4;
+        }
+
+        @media (max-width: 768px) {
+            .game-title { font-size: 36px; }
+            .ui-overlay { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 10px; 
+            }
+            .leaderboard { 
+                position: relative; 
+                margin-top: 20px; 
+                max-height: 200px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div class="ui-overlay">
+            <div class="score-panel">
+                <h3>Score</h3>
+                <div class="score-value" id="currentScore">0</div>
+                <div class="power-ups-display" id="powerUpsDisplay"></div>
+            </div>
+            <div class="timer-panel">
+                <div class="timer-value" id="timeLeft">30</div>
+            </div>
+        </div>
+
+        <div class="combo-indicator" id="comboIndicator"></div>
+        <div class="power-up-indicator" id="powerUpIndicator"></div>
+
+        <div class="start-screen" id="startScreen">
+            <div class="start-content">
+                <h1 class="game-title">NARAYA RAIN</h1>
+                <p class="game-subtitle">Catch the Refreshment!</p>
+                
+                <div class="instructions">
+                    <h3>How to Play</h3>
+                    <ul>
+                        <li>Move basket with ← → arrow keys or mouse</li>
+                        <li>Catch Naraya cans for points (10 pts)</li>
+                        <li>Golden cans are worth 50 points!</li>
+                        <li>Avoid competitor products (-20 pts)</li>
+                        <li>Catch 3+ in a row for combo bonus!</li>
+                        <li>Survive 30 seconds for maximum score!</li>
+                    </ul>
+                </div>
+                
+                <button class="btn" onclick="startGame()">START GAME</button>
+                <button class="btn" onclick="toggleLeaderboard()">VIEW SCORES</button>
+                <button class="btn" onclick="adminReset()" style="font-size: 12px; padding: 8px 15px; background: #8B0000; color: white; border: 2px solid #FFD700; margin-top: 20px;">ADMIN RESET</button>
+            </div>
+        </div>
+
+        <div class="game-over-screen" id="gameOverScreen">
+            <div class="game-over-content">
+                <h2>Game Over!</h2>
+                <div class="final-score" id="finalScore">0</div>
+                <p id="performanceMessage">Great job!</p>
+                <input type="text" class="name-input" id="playerName" placeholder="Enter your name" maxlength="20">
+                <div>
+                    <button class="btn" onclick="saveScore()">SAVE & VIEW SCORES</button>
+                    <button class="btn" onclick="playAgain()">PLAY AGAIN</button>
+                    <button class="btn" onclick="discardAndRestart()" id="discardBtn" style="display: none; background: #8B0000; color: white;">DON'T SAVE - RESTART</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="leaderboard" id="leaderboard" style="display: none;">
+            <h3>🏆 TOP 10 HIGH SCORES 🏆</h3>
+            <div id="leaderboardList"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="btn" onclick="startGame()" style="font-size: 16px; padding: 12px 25px; margin: 5px;">START GAME</button>
+                <button class="btn" onclick="closeLeaderboard()" style="font-size: 14px; padding: 10px 20px; margin: 5px;">BACK TO MENU</button>
+                <button class="btn" onclick="adminReset()" style="font-size: 12px; padding: 8px 15px; background: #8B0000; color: white; border: 2px solid #FFD700; margin: 5px;">ADMIN RESET</button>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <button class="reset-btn" onclick="resetLeaderboard()" style="display: none;">Reset Scores</button>
+        </div>
+    </div>
+
+    <script>
+        // Game Configuration - Easy to modify for balance
+        const CONFIG = {
+            GAME_DURATION: 30000, // 30 seconds
+            PLAYER_SPEED: 8,
+            ITEM_SPAWN_RATE: 0.035, // Increased from 0.02 to 0.035 (3.5%)
+            ITEM_FALL_SPEED: 3,
+            POWER_UP_CHANCE: 0.15,
+            GOLDEN_CAN_CHANCE: 0.15, // Increased from 0.1 to 0.15 (15%)
+            COMPETITOR_CHANCE: 0.2,
+            COMBO_THRESHOLD: 3,
+            SCORING: {
+                NORMAL_CAN: 10,
+                GOLDEN_CAN: 50,
+                COMPETITOR_PENALTY: -20,
+                COMBO_MULTIPLIER: 1.5
+            },
+            POWER_UPS: {
+                SPEEDBOOST_DURATION: 5000,
+                MULTIPLYPOINTS_DURATION: 5000
+            }
+        };
+
+        // Game State Management
+        class GameState {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.score = 0;
+                this.timeLeft = CONFIG.GAME_DURATION;
+                this.isPlaying = false;
+                this.isPaused = false;
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.powerUps = {
+                    speedBoost: { active: false, endTime: 0 },
+                    multiplyPoints: { active: false, endTime: 0 }
+                };
+                this.statistics = {
+                    cansHit: 0,
+                    goldenCansHit: 0,
+                    competitorHits: 0,
+                    missedCans: 0
+                };
+            }
+
+            updatePowerUps(currentTime) {
+                Object.keys(this.powerUps).forEach(powerUp => {
+                    if (this.powerUps[powerUp].active && currentTime > this.powerUps[powerUp].endTime) {
+                        this.powerUps[powerUp].active = false;
+                    }
+                });
+                this.updatePowerUpDisplay();
+            }
+
+            activatePowerUp(type, duration) {
+                this.powerUps[type].active = true;
+                this.powerUps[type].endTime = Date.now() + duration;
+                
+                const messages = {
+                    speedBoost: 'SPEED BOOST!',
+                    multiplyPoints: '2X MULTIPLIER!'
+                };
+                this.showPowerUpIndicator(messages[type]);
+                this.updatePowerUpDisplay();
+            }
+
+            updatePowerUpDisplay() {
+                const display = document.getElementById('powerUpsDisplay');
+                const currentTime = Date.now();
+                let html = '';
+
+                if (this.powerUps.multiplyPoints.active) {
+                    const remaining = Math.ceil((this.powerUps.multiplyPoints.endTime - currentTime) / 1000);
+                    html += `<div class="power-up-item multiplier">2X Multi: ${remaining}s</div>`;
+                }
+
+                if (this.powerUps.speedBoost.active) {
+                    const remaining = Math.ceil((this.powerUps.speedBoost.endTime - currentTime) / 1000);
+                    html += `<div class="power-up-item speed">⏱️ Speed: ${remaining}s</div>`;
+                }
+
+                display.innerHTML = html;
+            }
+
+            showPowerUpIndicator(message) {
+                const indicator = document.getElementById('powerUpIndicator');
+                indicator.textContent = message;
+                if (message) {
+                    indicator.style.opacity = '1';
+                    setTimeout(() => {
+                        indicator.style.opacity = '0';
+                    }, 2000);
+                } else {
+                    indicator.style.opacity = '0';
+                }
+            }
+
+            addScore(points) {
+                let finalPoints = points;
+                
+                // Apply 2x multiplier power-up
+                if (this.powerUps.multiplyPoints.active && points > 0) {
+                    finalPoints *= 2;
+                }
+                
+                // Apply combo multiplier
+                if (this.combo >= CONFIG.COMBO_THRESHOLD && points > 0) {
+                    finalPoints = Math.floor(finalPoints * CONFIG.SCORING.COMBO_MULTIPLIER);
+                }
+                
+                this.score = Math.max(0, this.score + finalPoints);
+                this.updateScoreDisplay();
+                
+                return finalPoints;
+            }
+
+            updateCombo(hit) {
+                if (hit) {
+                    this.combo++;
+                    this.maxCombo = Math.max(this.maxCombo, this.combo);
+                    
+                    if (this.combo >= CONFIG.COMBO_THRESHOLD) {
+                        this.showComboIndicator(`${this.combo}x COMBO!`);
+                    }
+                } else {
+                    this.combo = 0;
+                }
+            }
+
+            showComboIndicator(text) {
+                const indicator = document.getElementById('comboIndicator');
+                indicator.textContent = text;
+                indicator.style.opacity = '1';
+                indicator.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                
+                setTimeout(() => {
+                    indicator.style.opacity = '0';
+                    indicator.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 1000);
+            }
+
+            updateScoreDisplay() {
+                document.getElementById('currentScore').textContent = this.score;
+            }
+
+            updateTimerDisplay() {
+                const seconds = Math.ceil(this.timeLeft / 1000);
+                document.getElementById('timeLeft').textContent = seconds;
+                
+                // Visual timer warning
+                const timerElement = document.getElementById('timeLeft');
+                if (seconds <= 5) {
+                    timerElement.style.color = '#FF4500';
+                    timerElement.style.animation = 'pulse 0.5s infinite';
+                } else {
+                    timerElement.style.color = 'white';
+                    timerElement.style.animation = 'none';
+                }
+            }
+        }
+
+        // Object Pool for Performance Optimization
+        class ObjectPool {
+            constructor(createFn, resetFn, maxSize = 50) {
+                this.createFn = createFn;
+                this.resetFn = resetFn;
+                this.pool = [];
+                this.active = [];
+                this.maxSize = maxSize;
+            }
+
+            get() {
+                let obj;
+                if (this.pool.length > 0) {
+                    obj = this.pool.pop();
+                } else {
+                    obj = this.createFn();
+                }
+                this.active.push(obj);
+                return obj;
+            }
+
+            release(obj) {
+                const index = this.active.indexOf(obj);
+                if (index > -1) {
+                    this.active.splice(index, 1);
+                    this.resetFn(obj);
+                    if (this.pool.length < this.maxSize) {
+                        this.pool.push(obj);
+                    }
+                }
+            }
+
+            releaseAll() {
+                while (this.active.length > 0) {
+                    this.release(this.active[0]);
+                }
+            }
+
+            getActiveObjects() {
+                return this.active;
+            }
+        }
+
+        // Game Entities
+        class Player {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.width = 80;
+                this.height = 60;
+                this.x = canvas.width / 2 - this.width / 2;
+                this.y = canvas.height - this.height - 20;
+                this.speed = CONFIG.PLAYER_SPEED;
+                this.targetX = this.x;
+            }
+
+            update(input) {
+                // Calculate speed with power-up
+                let currentSpeed = this.speed;
+                if (game && game.gameState.powerUps.speedBoost.active) {
+                    currentSpeed *= 2.0; // Double speed (100% increase)
+                }
+
+                // Smooth movement towards target
+                const dx = this.targetX - this.x;
+                if (Math.abs(dx) > 1) {
+                    this.x += dx * 0.15;
+                } else {
+                    this.x = this.targetX;
+                }
+
+                // Handle input with power-up speed
+                if (input.left && this.targetX > 0) {
+                    this.targetX -= currentSpeed;
+                }
+                if (input.right && this.targetX < this.canvas.width - this.width) {
+                    this.targetX += currentSpeed;
+                }
+
+                // Keep in bounds
+                this.targetX = Math.max(0, Math.min(this.canvas.width - this.width, this.targetX));
+                this.x = Math.max(0, Math.min(this.canvas.width - this.width, this.x));
+            }
+
+            draw(ctx) {
+                // Draw basket with gradient and shadow
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetY = 3;
+
+                // Basket body
+                const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
+                gradient.addColorStop(0, '#8B4513');
+                gradient.addColorStop(1, '#5D4037');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+
+                // Basket rim
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(this.x - 5, this.y - 5, this.width + 10, 8);
+
+                // Basket pattern
+                ctx.strokeStyle = '#4A2C2A';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    const lineY = this.y + (i + 1) * (this.height / 4);
+                    ctx.beginPath();
+                    ctx.moveTo(this.x + 5, lineY);
+                    ctx.lineTo(this.x + this.width - 5, lineY);
+                    ctx.stroke();
+                }
+
+                ctx.shadowColor = 'transparent';
+            }
+
+            getBounds() {
+                return {
+                    x: this.x,
+                    y: this.y,
+                    width: this.width,
+                    height: this.height
+                };
+            }
+        }
+
+        class FallingItem {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = 0;
+                this.y = 0;
+                this.width = 40;
+                this.height = 60;
+                this.speed = CONFIG.ITEM_FALL_SPEED;
+                this.type = 'normal'; // normal, golden, competitor, powerup
+                this.powerUpType = null;
+                this.rotation = 0;
+                this.rotationSpeed = 0.1;
+                this.active = true;
+            }
+
+            spawn(canvasWidth) {
+                this.x = Math.random() * (canvasWidth - this.width);
+                this.y = -this.height;
+                this.active = true;
+                
+                // Determine item type
+                const rand = Math.random();
+                if (rand < CONFIG.COMPETITOR_CHANCE) {
+                    this.type = 'competitor';
+                    this.width = 35;
+                    this.height = 55;
+                } else if (rand < CONFIG.COMPETITOR_CHANCE + CONFIG.GOLDEN_CAN_CHANCE) {
+                    this.type = 'golden';
+                    this.rotationSpeed = 0.15;
+                } else if (rand < CONFIG.COMPETITOR_CHANCE + CONFIG.GOLDEN_CAN_CHANCE + CONFIG.POWER_UP_CHANCE) {
+                    this.type = 'powerup';
+                    this.powerUpType = Math.random() < 0.5 ? 'speedBoost' : 'multiplyPoints';
+                    this.width = 35;
+                    this.height = 35;
+                    this.rotationSpeed = 0.2;
+                } else {
+                    this.type = 'normal';
+                }
+            }
+
+            update(gameState) {
+                if (!this.active) return false;
+
+                // Normal falling speed (no slow time effect)
+                this.y += this.speed;
+                this.rotation += this.rotationSpeed;
+
+                // Remove if off screen
+                if (this.y > 700) {
+                    if (this.type === 'normal' || this.type === 'golden') {
+                        gameState.statistics.missedCans++;
+                        gameState.updateCombo(false);
+                    }
+                    return false;
+                }
+
+                return true;
+            }
+
+            draw(ctx) {
+                if (!this.active) return;
+
+                ctx.save();
+                ctx.translate(this.x + this.width/2, this.y + this.height/2);
+                ctx.rotate(this.rotation);
+
+                // Draw shadow
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+
+                switch (this.type) {
+                    case 'normal':
+                        this.drawNormalCan(ctx);
+                        break;
+                    case 'golden':
+                        this.drawGoldenCan(ctx);
+                        break;
+                    case 'competitor':
+                        this.drawCompetitorProduct(ctx);
+                        break;
+                    case 'powerup':
+                        this.drawPowerUp(ctx);
+                        break;
+                }
+
+                ctx.restore();
+            }
+
+            drawNormalCan(ctx) {
+                // Naraya can - red with silver
+                const gradient = ctx.createLinearGradient(-this.width/2, -this.height/2, this.width/2, this.height/2);
+                gradient.addColorStop(0, '#FF4500');
+                gradient.addColorStop(0.5, '#DC143C');
+                gradient.addColorStop(1, '#8B0000');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+
+                // Can details
+                ctx.fillStyle = '#C0C0C0';
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, 8);
+                ctx.fillRect(-this.width/2, this.height/2 - 8, this.width, 8);
+
+                // Naraya label
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('NARAYA', 0, -5);
+                ctx.fillText('DRINK', 0, 8);
+            }
+
+            drawGoldenCan(ctx) {
+                // Golden special can
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width/2);
+                gradient.addColorStop(0, '#FFD700');
+                gradient.addColorStop(0.7, '#FFA500');
+                gradient.addColorStop(1, '#FF8C00');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+
+                // Sparkle effect
+                ctx.fillStyle = 'white';
+                const sparkles = [
+                    [-10, -15], [8, -20], [-5, 0], [12, 5], [-8, 15]
+                ];
+                sparkles.forEach(([sx, sy]) => {
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // Golden label
+                ctx.fillStyle = '#8B0000';
+                ctx.font = 'bold 9px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('GOLDEN', 0, -5);
+                ctx.fillText('NARAYA', 0, 8);
+            }
+
+            drawCompetitorProduct(ctx) {
+                // Competitor product - different colors
+                ctx.fillStyle = '#4169E1';
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+
+                // X mark to indicate avoid
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(-this.width/3, -this.height/3);
+                ctx.lineTo(this.width/3, this.height/3);
+                ctx.moveTo(this.width/3, -this.height/3);
+                ctx.lineTo(-this.width/3, this.height/3);
+                ctx.stroke();
+
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 8px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('AVOID', 0, 0);
+            }
+
+            drawPowerUp(ctx) {
+                if (this.powerUpType === 'multiplyPoints') {
+                    // 2X Multiplier - 3D "2X" text
+                    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width/2);
+                    gradient.addColorStop(0, '#FF69B4');
+                    gradient.addColorStop(0.7, '#FF1493');
+                    gradient.addColorStop(1, '#C71585');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 3D effect for "2X" text
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // Shadow/depth effect
+                    ctx.fillStyle = '#8B0000';
+                    ctx.fillText('2X', 2, 2);
+                    ctx.fillStyle = '#4B0000';
+                    ctx.fillText('2X', 1, 1);
+                    
+                    // Main text
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillText('2X', 0, 0);
+                    
+                } else if (this.powerUpType === 'speedBoost') {
+                    // Speed Boost - Clock with speed indication
+                    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width/2);
+                    gradient.addColorStop(0, '#00CED1');
+                    gradient.addColorStop(0.7, '#00BFFF');
+                    gradient.addColorStop(1, '#0080FF');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Clock face
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width/2 - 3, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Clock hands pointing to speed (like speedometer)
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 3;
+                    ctx.lineCap = 'round';
+                    
+                    // Hour hand (short)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(-3, -8);
+                    ctx.stroke();
+                    
+                    // Minute hand (long) - pointing up-right for "fast"
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(6, -10);
+                    ctx.stroke();
+
+                    // Speed lines around clock for motion effect
+                    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+                    ctx.lineWidth = 1;
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i * Math.PI * 2) / 6;
+                        const x1 = Math.cos(angle) * (this.width/2 + 2);
+                        const y1 = Math.sin(angle) * (this.width/2 + 2);
+                        const x2 = Math.cos(angle) * (this.width/2 + 6);
+                        const y2 = Math.sin(angle) * (this.width/2 + 6);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.stroke();
+                    }
+
+                    // Center dot
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            getBounds() {
+                return {
+                    x: this.x,
+                    y: this.y,
+                    width: this.width,
+                    height: this.height
+                };
+            }
+
+            checkCollision(player) {
+                const playerBounds = player.getBounds();
+                const itemBounds = this.getBounds();
+
+                return itemBounds.x < playerBounds.x + playerBounds.width &&
+                       itemBounds.x + itemBounds.width > playerBounds.x &&
+                       itemBounds.y < playerBounds.y + playerBounds.height &&
+                       itemBounds.y + itemBounds.height > playerBounds.y;
+            }
+        }
+
+        // Input Management
+        class InputManager {
+            constructor() {
+                this.keys = {};
+                this.mouse = { x: 0, y: 0 };
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    const canvas = document.getElementById('gameCanvas');
+                    const rect = canvas.getBoundingClientRect();
+                    this.mouse.x = e.clientX - rect.left;
+                    this.mouse.y = e.clientY - rect.top;
+                });
+            }
+
+            getInput() {
+                return {
+                    left: this.keys['ArrowLeft'] || this.keys['KeyA'],
+                    right: this.keys['ArrowRight'] || this.keys['KeyD'],
+                    mouse: this.mouse
+                };
+            }
+        }
+
+        // Audio Manager
+        class AudioManager {
+            constructor() {
+                this.sounds = {};
+                this.enabled = true;
+                this.audioContext = null;
+                this.createSounds();
+            }
+
+            createSounds() {
+                // Initialize audio context on first user interaction
+                if (!this.audioContext) {
+                    try {
+                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) {
+                        console.log('Audio not supported');
+                        this.enabled = false;
+                        return;
+                    }
+                }
+
+                // Simple sound synthesis
+                this.sounds = {
+                    catch: () => this.playTone(523.25, 0.1, 'square'), // C5
+                    goldenCatch: () => this.playTone(659.25, 0.2, 'sine'), // E5
+                    powerUp: () => this.playTone(783.99, 0.3, 'triangle'), // G5
+                    miss: () => this.playTone(196, 0.2, 'sawtooth'), // G3
+                    gameOver: () => this.playTone(130.81, 0.5, 'sine') // C3
+                };
+            }
+
+            playTone(frequency, duration, type = 'sine') {
+                if (!this.enabled || !this.audioContext) return;
+
+                try {
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    console.log('Audio playback error:', e);
+                }
+            }
+
+            play(soundName) {
+                if (this.sounds[soundName]) {
+                    this.sounds[soundName]();
+                }
+            }
+
+            resume() {
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            }
+        }
+
+        // Particle System for Visual Effects
+        class ParticleSystem {
+            constructor() {
+                this.particles = [];
+            }
+
+            createExplosion(x, y, color, count = 8) {
+                for (let i = 0; i < count; i++) {
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        color: color,
+                        life: 1.0,
+                        decay: 0.02,
+                        size: Math.random() * 4 + 2
+                    });
+                }
+            }
+
+            update() {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const particle = this.particles[i];
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.vy += 0.3; // gravity
+                    particle.life -= particle.decay;
+
+                    if (particle.life <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                this.particles.forEach(particle => {
+                    ctx.globalAlpha = particle.life;
+                    ctx.fillStyle = particle.color;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+            }
+        }
+
+        // Main Game Engine
+        class NarayaRainGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.gameState = new GameState();
+                this.input = new InputManager();
+                this.audio = new AudioManager();
+                this.particles = new ParticleSystem();
+                
+                this.player = new Player(this.canvas);
+                this.itemPool = new ObjectPool(
+                    () => new FallingItem(),
+                    (item) => item.reset()
+                );
+                
+                this.lastSpawnTime = 0;
+                this.lastFrameTime = 0;
+                this.animationId = null;
+                
+                this.setupMouseControl();
+                this.loadLeaderboard();
+            }
+
+            setupMouseControl() {
+                this.canvas.addEventListener('mousemove', (e) => {
+                    if (!this.gameState.isPlaying) return;
+                    
+                    const rect = this.canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    this.player.targetX = mouseX - this.player.width / 2;
+                });
+            }
+
+            start() {
+                this.gameState.reset();
+                this.gameState.isPlaying = true;
+                this.itemPool.releaseAll();
+                this.particles.particles = [];
+                
+                // Reset UI displays
+                this.gameState.updateScoreDisplay();
+                this.gameState.updateTimerDisplay();
+                
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('gameOverScreen').style.display = 'none';
+                document.getElementById('leaderboard').style.display = 'none';
+                
+                this.audio.resume();
+                this.lastFrameTime = performance.now();
+                this.gameLoop();
+            }
+
+            gameLoop() {
+                const currentTime = performance.now();
+                const deltaTime = currentTime - this.lastFrameTime;
+                this.lastFrameTime = currentTime;
+
+                if (this.gameState.isPlaying && !this.gameState.isPaused) {
+                    this.update(deltaTime);
+                }
+                
+                this.draw();
+                
+                if (this.gameState.isPlaying) {
+                    this.animationId = requestAnimationFrame(() => this.gameLoop());
+                }
+            }
+
+            update(deltaTime) {
+                // Update game timer
+                this.gameState.timeLeft -= deltaTime;
+                this.gameState.updateTimerDisplay();
+                
+                if (this.gameState.timeLeft <= 0) {
+                    this.endGame();
+                    return;
+                }
+
+                // Update power-ups
+                this.gameState.updatePowerUps(Date.now());
+
+                // Update player
+                const input = this.input.getInput();
+                this.player.update(input);
+
+                // Spawn items
+                const currentTimeMs = performance.now();
+                if (currentTimeMs - this.lastSpawnTime > 1000 / (CONFIG.ITEM_SPAWN_RATE * 60)) {
+                    if (Math.random() < CONFIG.ITEM_SPAWN_RATE) {
+                        const item = this.itemPool.get();
+                        item.spawn(this.canvas.width);
+                        this.lastSpawnTime = currentTimeMs;
+                    }
+                }
+
+                // Update items and check collisions
+                const activeItems = this.itemPool.getActiveObjects();
+                for (let i = activeItems.length - 1; i >= 0; i--) {
+                    const item = activeItems[i];
+                    
+                    if (!item.update(this.gameState)) {
+                        this.itemPool.release(item);
+                        continue;
+                    }
+
+                    // Check collision with player
+                    if (item.checkCollision(this.player)) {
+                        this.handleItemCatch(item);
+                        this.itemPool.release(item);
+                    }
+                }
+
+                // Update particles
+                this.particles.update();
+            }
+
+            handleItemCatch(item) {
+                let points = 0;
+                let comboHit = false;
+
+                switch (item.type) {
+                    case 'normal':
+                        points = CONFIG.SCORING.NORMAL_CAN;
+                        comboHit = true;
+                        this.gameState.statistics.cansHit++;
+                        this.audio.play('catch');
+                        this.particles.createExplosion(
+                            item.x + item.width/2, 
+                            item.y + item.height/2, 
+                            '#FFD700', 6
+                        );
+                        break;
+
+                    case 'golden':
+                        points = CONFIG.SCORING.GOLDEN_CAN;
+                        comboHit = true;
+                        this.gameState.statistics.goldenCansHit++;
+                        this.audio.play('goldenCatch');
+                        this.particles.createExplosion(
+                            item.x + item.width/2, 
+                            item.y + item.height/2, 
+                            '#FFD700', 12
+                        );
+                        break;
+
+                    case 'competitor':
+                        points = CONFIG.SCORING.COMPETITOR_PENALTY;
+                        comboHit = false;
+                        this.gameState.statistics.competitorHits++;
+                        this.audio.play('miss');
+                        this.particles.createExplosion(
+                            item.x + item.width/2, 
+                            item.y + item.height/2, 
+                            '#FF0000', 8
+                        );
+                        break;
+
+                    case 'powerup':
+                        this.gameState.activatePowerUp(
+                            item.powerUpType, 
+                            CONFIG.POWER_UPS[item.powerUpType.toUpperCase() + '_DURATION']
+                        );
+                        this.audio.play('powerUp');
+                        this.particles.createExplosion(
+                            item.x + item.width/2, 
+                            item.y + item.height/2, 
+                            '#00FFFF', 10
+                        );
+                        break;
+                }
+
+                this.gameState.updateCombo(comboHit);
+                if (points !== 0) {
+                    this.gameState.addScore(points);
+                }
+            }
+
+            draw() {
+                // Clear canvas with gradient background
+                const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+                gradient.addColorStop(0, '#87CEEB');
+                gradient.addColorStop(1, '#98FB98');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw game objects
+                this.player.draw(this.ctx);
+                
+                this.itemPool.getActiveObjects().forEach(item => {
+                    item.draw(this.ctx);
+                });
+
+                this.particles.draw(this.ctx);
+
+                // Draw power-up effects - no visual overlays needed
+                // Power-ups now show in UI panel instead
+            }
+
+            endGame() {
+                this.gameState.isPlaying = false;
+                this.audio.play('gameOver');
+                
+                // Calculate performance message
+                const score = this.gameState.score;
+                let message = 'Great job!';
+                
+                if (score >= 1000) message = 'AMAZING! You\'re a Naraya Master!';
+                else if (score >= 500) message = 'Excellent! You\'ve got great reflexes!';
+                else if (score >= 200) message = 'Good job! Keep practicing!';
+                else if (score >= 50) message = 'Not bad! Try again for a higher score!';
+                else message = 'Keep trying! You\'ll get better!';
+
+                document.getElementById('finalScore').textContent = score;
+                document.getElementById('performanceMessage').textContent = message;
+                document.getElementById('gameOverScreen').style.display = 'flex';
+                
+                // Clear name input for fresh start
+                document.getElementById('playerName').value = '';
+                document.getElementById('playerName').focus();
+            }
+
+            pauseGame() {
+                if (!this.gameState.isPlaying) return;
+                
+                this.gameState.isPlaying = false;
+                this.audio.play('gameOver');
+                
+                // Show pause/cancel message with different options
+                document.getElementById('finalScore').textContent = this.gameState.score;
+                document.getElementById('performanceMessage').textContent = 'Game Cancelled - Choose your action:';
+                document.getElementById('gameOverScreen').style.display = 'flex';
+                
+                // Show discard button for cancelled games
+                document.getElementById('discardBtn').style.display = 'inline-block';
+                
+                // Clear name input
+                document.getElementById('playerName').value = '';
+                document.getElementById('playerName').focus();
+            }
+
+            // Reset display for normal game over
+            endGame() {
+                this.gameState.isPlaying = false;
+                this.audio.play('gameOver');
+                
+                // Calculate performance message
+                const score = this.gameState.score;
+                let message = 'Great job!';
+                
+                if (score >= 1000) message = 'AMAZING! You\'re a Naraya Master!';
+                else if (score >= 500) message = 'Excellent! You\'ve got great reflexes!';
+                else if (score >= 200) message = 'Good job! Keep practicing!';
+                else if (score >= 50) message = 'Not bad! Try again for a higher score!';
+                else message = 'Keep trying! You\'ll get better!';
+
+                document.getElementById('finalScore').textContent = score;
+                document.getElementById('performanceMessage').textContent = message;
+                document.getElementById('gameOverScreen').style.display = 'flex';
+                
+                // Hide discard button for completed games
+                document.getElementById('discardBtn').style.display = 'none';
+                
+                // Clear name input for fresh start
+                document.getElementById('playerName').value = '';
+                document.getElementById('playerName').focus();
+            }
+
+            // Leaderboard Management
+            loadLeaderboard() {
+                const saved = localStorage.getItem('narayaRainLeaderboard');
+                this.leaderboard = saved ? JSON.parse(saved) : [];
+                this.updateLeaderboardDisplay();
+            }
+
+            saveLeaderboard() {
+                localStorage.setItem('narayaRainLeaderboard', JSON.stringify(this.leaderboard));
+                this.updateLeaderboardDisplay();
+            }
+
+            addScore(name, score) {
+                this.leaderboard.push({ name: name || 'Anonymous', score, date: Date.now() });
+                this.leaderboard.sort((a, b) => b.score - a.score);
+                this.leaderboard = this.leaderboard.slice(0, 10); // Keep only top 10
+                this.saveLeaderboard();
+            }
+
+            updateLeaderboardDisplay() {
+                const list = document.getElementById('leaderboardList');
+                if (this.leaderboard.length === 0) {
+                    list.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No scores yet!<br>Be the first to play!</div>';
+                    return;
+                }
+
+                // Show only top 10, but ensure we're displaying exactly what we have
+                const topScores = this.leaderboard.slice(0, 10);
+                list.innerHTML = topScores.map((entry, index) => `
+                    <div class="leaderboard-entry">
+                        <span class="rank">#${index + 1}</span>
+                        <span class="player-name">${entry.name}</span>
+                        <span class="player-score">${entry.score}</span>
+                    </div>
+                `).join('');
+            }
+
+            resetLeaderboard() {
+                // Remove the confirm dialog - security is handled by adminReset function
+                this.leaderboard = [];
+                this.saveLeaderboard();
+            }
+        }
+
+        // Global game instance
+        let game;
+
+        // Game control functions
+        function startGame() {
+            if (!game) {
+                game = new NarayaRainGame();
+            }
+            game.start();
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            startGame();
+        }
+
+        function saveScore() {
+            const name = document.getElementById('playerName').value.trim();
+            const playerName = name.length > 0 ? name : 'No Name';
+            
+            game.addScore(playerName, game.gameState.score);
+            
+            // Hide game over screen and show leaderboard modal
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('leaderboard').style.display = 'block';
+        }
+
+        function playAgain() {
+            // Auto-save score first
+            const name = document.getElementById('playerName').value.trim();
+            const playerName = name.length > 0 ? name : 'No Name';
+            
+            game.addScore(playerName, game.gameState.score);
+            
+            // Then restart game immediately
+            document.getElementById('gameOverScreen').style.display = 'none';
+            startGame();
+        }
+
+        function discardAndRestart() {
+            // Don't save score, just restart
+            document.getElementById('gameOverScreen').style.display = 'none';
+            startGame();
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            startGame();
+        }
+
+        function closeLeaderboard() {
+            document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'flex';
+        }
+
+        function toggleLeaderboard() {
+            const leaderboard = document.getElementById('leaderboard');
+            const startScreen = document.getElementById('startScreen');
+            
+            if (leaderboard.style.display === 'none') {
+                leaderboard.style.display = 'block';
+                startScreen.style.display = 'none';
+            } else {
+                leaderboard.style.display = 'none';
+                startScreen.style.display = 'flex';
+            }
+        }
+
+        function adminReset() {
+            console.log('Admin reset button clicked'); // Debug log
+            
+            const code = prompt('Please enter a code to reset the leaderboard:');
+            console.log('Code entered:', code); // Debug log
+            
+            if (code === 'reset') {
+                if (confirm('Are you sure you want to reset ALL scores? This cannot be undone!')) {
+                    // Initialize game if it doesn't exist
+                    if (!game) {
+                        game = new NarayaRainGame();
+                    }
+                    
+                    game.leaderboard = [];
+                    game.saveLeaderboard();
+                    alert('Leaderboard has been reset successfully.');
+                    console.log('Leaderboard reset completed'); // Debug log
+                }
+            } else if (code !== null && code !== '') {
+                alert('Incorrect code. Please try again.');
+            }
+        }
+
+        function resetLeaderboard() {
+            // This function is now hidden - adminReset handles the logic
+            adminReset();
+        }
+
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // ESC key to pause/stop game
+                if (e.code === 'Escape') {
+                    e.preventDefault();
+                    if (game && game.gameState.isPlaying) {
+                        game.pauseGame();
+                    }
+                }
+                
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    const startScreen = document.getElementById('startScreen');
+                    const gameOverScreen = document.getElementById('gameOverScreen');
+                    
+                    if (startScreen.style.display !== 'none') {
+                        startGame();
+                    } else if (gameOverScreen.style.display !== 'none') {
+                        playAgain();
+                    }
+                }
+                
+                if (e.code === 'Enter') {
+                    const gameOverScreen = document.getElementById('gameOverScreen');
+                    if (gameOverScreen.style.display !== 'none') {
+                        saveScore();
+                    }
+                }
+            });
+
+            // Add CSS animation for timer pulse
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            console.log('Naraya Rain Game initialized - Senior Engineer Implementation');
+            console.log('Features: Object pooling, particle system, power-ups, combo system');
+            console.log('Press SPACE to start, Enter to save score');
+        });
+    </script>
+</body>
+</html>

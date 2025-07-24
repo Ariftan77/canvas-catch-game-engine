@@ -1,4 +1,100 @@
-📋 Project Overview
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## 🚀 Development Commands
+Since this is a vanilla JavaScript project with no build system:
+- **Development**: Open `index.html` in browser or use live server
+- **Testing**: Manual browser testing across Chrome, Firefox, Safari, Edge
+- **Performance**: Use browser DevTools for 60fps monitoring and memory profiling
+- **Deployment**: Single HTML file ready for offline use at events
+
+## 📁 Code Architecture
+Expected project structure for modular development:
+```
+canvas-catch-game-engine/
+├── 📄 README.md                 # Main documentation
+├── 📄 LICENSE                   # MIT License
+├── 📄 .gitignore               # Git ignore file
+├── 📄 package.json             # Project metadata (optional)
+│
+├── 📁 src/                     # Source code (development)
+│   ├── 📄 index.html           # Main HTML structure
+│   ├── 📁 js/
+│   │   ├── 📄 game-engine.js   # Core game logic
+│   │   ├── 📄 config.js        # Game configuration
+│   │   ├── 📄 player.js        # Player class
+│   │   ├── 📄 items.js         # Falling items system
+│   │   ├── 📄 audio.js         # Audio management
+│   │   ├── 📄 particles.js     # Particle effects
+│   │   └── 📄 leaderboard.js   # Score management
+│   ├── 📁 css/
+│   │   ├── 📄 game.css         # Main styles
+│   │   └── 📄 responsive.css   # Mobile styles
+│   └── 📁 assets/
+│       ├── 📁 images/          # Game sprites
+│       │   ├── 📄 naraya-can.png
+│       │   ├── 📄 golden-can.png
+│       │   ├── 📄 competitor.png
+│       │   └── 📄 background.png
+│       └── 📁 sounds/          # Audio files (optional)
+│
+├── 📁 dist/                    # Production builds
+│   ├── 📄 game.html            # Single-file version (for events)
+│   ├── 📄 game.min.html        # Minified version
+│   └── 📁 themes/              # Pre-built themes
+│       ├── 📄 beverages.html
+│       ├── 📄 tech.html
+│       └── 📄 fashion.html
+│
+├── 📁 examples/                # Different brand implementations
+│   ├── 📁 naraya-theme/
+│   │   ├── 📄 index.html
+│   │   └── 📁 assets/
+│   ├── 📁 tech-theme/
+│   │   ├── 📄 index.html
+│   │   └── 📁 assets/
+│   └── 📁 fashion-theme/
+│       ├── 📄 index.html
+│       └── 📁 assets/
+│
+├── 📁 docs/                    # Documentation
+│   ├── 📄 SETUP.md            # Quick start guide
+│   ├── 📄 CUSTOMIZATION.md    # Branding guide
+│   ├── 📄 DEPLOYMENT.md       # Deploy instructions
+│   ├── 📄 API.md              # Configuration reference
+│   ├── 📄 MARKETING.md        # Event best practices
+│   └── 📁 screenshots/        # Demo images
+│       ├── 📄 gameplay.png
+│       ├── 📄 leaderboard.png
+│       └── 📄 admin-panel.png
+│
+├── 📁 tools/                   # Build and utility scripts
+│   ├── 📄 build.js            # Combine files into single HTML
+│   ├── 📄 minify.js           # Minification script
+│   └── 📄 theme-generator.js   # Theme template generator
+│
+├── 📁 tests/                   # Testing (optional but professional)
+│   ├── 📄 game-engine.test.js
+│   └── 📄 scoring.test.js
+│
+└── 📁 deployment/              # Deployment configurations
+    ├── 📄 Dockerfile          # Docker setup
+    ├── 📄 railway.json        # Railway config
+    ├── 📄 netlify.toml        # Netlify config
+    └── 📁 electron/           # Desktop app config
+        ├── 📄 main.js
+        └── 📄 package.json
+```
+
+## 🔧 Key Development Guidelines
+- **Performance**: Maintain 60fps with object pooling and efficient canvas operations
+- **Code Style**: Vanilla JavaScript ES6+, modular architecture, consistent naming
+- **Brand Integration**: Naraya red theme (#DC143C, #8B0000), gold accents (#FFD700)
+- **Offline First**: Must work without internet connection for event deployment
+- **Cross-browser**: Compatible with modern browsers on Windows event computers
+
+## 📋 Project Overview
 Game Name: Naraya Rain - Catch the Refreshment!
 Type: Browser-based falling object catching game
 Platform: Web (HTML5 Canvas)
