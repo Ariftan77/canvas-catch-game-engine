@@ -17,27 +17,28 @@ body {
     width: 100vw;
     height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+}
+
+/* UI Header above the game */
+.ui-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.7);
+    border-bottom: 3px solid #FFD700;
+    z-index: 100;
+    min-height: 80px;
 }
 
 #gameCanvas {
-    border: 3px solid #FFD700;
-    border-radius: 10px;
+    flex: 1;
+    width: 100vw;
+    height: calc(100vh - 80px);
+    border: none;
     background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.ui-overlay {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    z-index: 100;
-    pointer-events: none;
+    display: block;
 }
 
 .score-panel {
@@ -65,6 +66,12 @@ body {
     border-radius: 10px;
     border: 2px solid #FFD700;
     text-align: center;
+}
+
+.timer-panel h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: white;
 }
 
 .timer-value {

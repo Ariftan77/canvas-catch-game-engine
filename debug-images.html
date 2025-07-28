@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Image Loading</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .image-test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .image-test img { max-width: 100px; max-height: 100px; margin-right: 10px; }
+        .status { font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Naraya Product Image Debug</h1>
+    <p>Testing if images can be loaded from: <code>src/assets/images/</code></p>
+    
+    <div id="results"></div>
+    
+    <script>
+        const images = [
+            'naraya_butterRing.jpeg',
+            'naraya_canCincau.jpeg',
+            'naraya_canSoyabean.jpeg',
+            'naraya_canTehBunga.jpeg',
+            'naraya_cheeseCookies.jpeg',
+            'naraya_chocholateCream.jpeg',
+            'naraya_marshmallow.jpeg',
+            'naraya_myChocho.jpeg',
+            'naraya_narabis.jpeg',
+            'naraya_nutsCrisp.jpeg',
+            'naraya_oatChocho.jpeg',
+            'naraya_oatChocho2.jpeg',
+            'naraya_oat_cookies.jpeg',
+            'naraya_plumCandy.jpeg'
+        ];
+        
+        const resultsDiv = document.getElementById('results');
+        let loadedCount = 0;
+        let errorCount = 0;
+        
+        images.forEach(imageName => {
+            const div = document.createElement('div');
+            div.className = 'image-test';
+            div.innerHTML = `
+                <img id="img-${imageName}" style="display:none;" />
+                <strong>${imageName}</strong> - 
+                <span class="status" id="status-${imageName}">Loading...</span>
+            `;
+            resultsDiv.appendChild(div);
+            
+            const img = document.getElementById(`img-${imageName}`);
+            const status = document.getElementById(`status-${imageName}`);
+            
+            img.onload = () => {
+                img.style.display = 'inline';
+                status.textContent = 'SUCCESS';
+                status.className = 'status success';
+                loadedCount++;
+                updateSummary();
+            };
+            
+            img.onerror = () => {
+                status.textContent = 'FAILED';
+                status.className = 'status error';
+                errorCount++;
+                updateSummary();
+            };
+            
+            img.src = `src/assets/images/${imageName}`;
+        });
+        
+        function updateSummary() {
+            const total = images.length;
+            const processed = loadedCount + errorCount;
+            
+            if (processed === total) {
+                const summary = document.createElement('div');
+                summary.innerHTML = `
+                    <h2>Summary</h2>
+                    <p><strong>Total:</strong> ${total}</p>
+                    <p><strong>Loaded:</strong> ${loadedCount}</p>
+                    <p><strong>Failed:</strong> ${errorCount}</p>
+                `;
+                resultsDiv.insertBefore(summary, resultsDiv.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>

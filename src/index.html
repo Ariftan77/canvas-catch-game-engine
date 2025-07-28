@@ -8,18 +8,21 @@
 </head>
 <body>
     <div class="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        
-        <div class="ui-overlay">
+        <!-- UI Header above the game -->
+        <div class="ui-header">
             <div class="score-panel">
                 <h3>Score</h3>
                 <div class="score-value" id="currentScore">0</div>
                 <div class="power-ups-display" id="powerUpsDisplay"></div>
             </div>
             <div class="timer-panel">
+                <h3>Time</h3>
                 <div class="timer-value" id="timeLeft">30</div>
             </div>
         </div>
+        
+        <!-- Full width game canvas -->
+        <canvas id="gameCanvas"></canvas>
 
         <div class="combo-indicator" id="comboIndicator"></div>
         <div class="power-up-indicator" id="powerUpIndicator"></div>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Product Configuration</title>
+</head>
+<body>
+    <h1>Product Configuration Test</h1>
+    <div id="output"></div>
+
+    <script src="src/js/config.js"></script>
+    <script>
+        console.log('Testing product configuration...');
+        
+        // Test weighted random selection
+        const testResults = {};
+        const iterations = 1000;
+
+        for (let i = 0; i < iterations; i++) {
+            const product = PRODUCT_CONFIG.getRandomProduct();
+            if (testResults[product.id]) {
+                testResults[product.id]++;
+            } else {
+                testResults[product.id] = 1;
+            }
+        }
+
+        console.log('Test results after', iterations, 'iterations:');
+        console.table(testResults);
+
+        // Calculate percentages
+        const output = document.getElementById('output');
+        let html = '<h2>Spawn Rate Test Results (1000 iterations)</h2><table border="1">';
+        html += '<tr><th>Product ID</th><th>Count</th><th>Percentage</th><th>Expected Weight</th></tr>';
+
+        // Sort by count descending
+        const sorted = Object.entries(testResults).sort((a, b) => b[1] - a[1]);
+
+        sorted.forEach(([productId, count]) => {
+            const percentage = ((count / iterations) * 100).toFixed(1);
+            
+            // Find product config
+            const allItems = [...PRODUCT_CONFIG.products, ...PRODUCT_CONFIG.powerups];
+            const product = allItems.find(p => p.id === productId);
+            const weight = product ? product.weight : 'Unknown';
+            
+            html += `<tr>
+                <td>${productId}</td>
+                <td>${count}</td>
+                <td>${percentage}%</td>
+                <td>${weight}</td>
+            </tr>`;
+        });
+
+        html += '</table>';
+        
+        // Show total weights
+        const totalWeight = PRODUCT_CONFIG.getTotalWeight();
+        html += `<p><strong>Total Weight:</strong> ${totalWeight}</p>`;
+        
+        // Show individual product details
+        html += '<h2>Product Configuration Details</h2>';
+        html += '<table border="1"><tr><th>ID</th><th>Type</th><th>Points</th><th>Weight</th><th>Expected %</th></tr>';
+        
+        [...PRODUCT_CONFIG.products, ...PRODUCT_CONFIG.powerups].forEach(product => {
+            const expectedPercent = ((product.weight / totalWeight) * 100).toFixed(1);
+            html += `<tr>
+                <td>${product.id}</td>
+                <td>${product.type}</td>
+                <td>${product.points || 'N/A'}</td>
+                <td>${product.weight}</td>
+                <td>${expectedPercent}%</td>
+            </tr>`;
+        });
+        
+        html += '</table>';
+        output.innerHTML = html;
+    </script>
+</body>
+</html>

@@ -9,35 +9,44 @@ class FallingItem {
         this.width = 40;
         this.height = 60;
         this.speed = CONFIG.ITEM_FALL_SPEED;
-        this.type = 'normal'; // normal, golden, competitor, powerup
+        this.type = 'normal';
+        this.productConfig = null;
         this.powerUpType = null;
         this.rotation = 0;
-        this.rotationSpeed = 0.1;
+        this.rotationSpeed = 0.2;
         this.active = true;
     }
 
     spawn(canvasWidth) {
-        this.x = Math.random() * (canvasWidth - this.width);
-        this.y = -this.height;
         this.active = true;
         
-        // Determine item type
-        const rand = Math.random();
-        if (rand < CONFIG.COMPETITOR_CHANCE) {
-            this.type = 'competitor';
-            this.width = 35;
-            this.height = 55;
-        } else if (rand < CONFIG.COMPETITOR_CHANCE + CONFIG.GOLDEN_CAN_CHANCE) {
-            this.type = 'golden';
-            this.rotationSpeed = 0.15;
-        } else if (rand < CONFIG.COMPETITOR_CHANCE + CONFIG.GOLDEN_CAN_CHANCE + CONFIG.POWER_UP_CHANCE) {
-            this.type = 'powerup';
-            this.powerUpType = Math.random() < 0.5 ? 'speedBoost' : 'multiplyPoints';
-            this.width = 35;
-            this.height = 35;
-            this.rotationSpeed = 0.2;
-        } else {
-            this.type = 'normal';
+        // Get random product from weighted configuration
+        this.productConfig = PRODUCT_CONFIG.getRandomProduct();
+        this.type = this.productConfig.type;
+        
+        // Set dimensions from product config
+        this.width = this.productConfig.width || 40;
+        this.height = this.productConfig.height || 60;
+        
+        // Position randomly across canvas width
+        this.x = Math.random() * (canvasWidth - this.width);
+        this.y = -this.height;
+        
+        // Set rotation speed based on type (disabled for better product visibility)
+        switch (this.type) {
+            case 'golden':
+                this.rotationSpeed = 0; // Disabled - keep products upright
+                break;
+            case 'powerup':
+                this.powerUpType = this.productConfig.id;
+                this.rotationSpeed = 0.1; // Keep slight rotation for power-ups to distinguish them
+                break;
+            case 'premium':
+                this.rotationSpeed = 0.05; // Disabled - keep products upright
+                break;
+            default:
+                this.rotationSpeed = 0.05; // Disabled - keep products upright
+                break;
         }
     }
 
@@ -50,7 +59,7 @@ class FallingItem {
 
         // Remove if off screen
         if (this.y > 700) {
-            if (this.type === 'normal' || this.type === 'golden') {
+            if (this.type === 'normal' || this.type === 'golden' || this.type === 'premium') {
                 gameState.statistics.missedCans++;
                 gameState.updateCombo(false);
             }
@@ -60,8 +69,8 @@ class FallingItem {
         return true;
     }
 
-    draw(ctx) {
-        if (!this.active) return;
+    draw(ctx, imageLoader) {
+        if (!this.active || !this.productConfig) return;
 
         ctx.save();
         ctx.translate(this.x + this.width/2, this.y + this.height/2);
@@ -73,22 +82,77 @@ class FallingItem {
         ctx.shadowOffsetX = 2;
         ctx.shadowOffsetY = 2;
 
-        switch (this.type) {
-            case 'normal':
-                this.drawNormalCan(ctx);
-                break;
-            case 'golden':
-                this.drawGoldenCan(ctx);
-                break;
-            case 'competitor':
-                this.drawCompetitorProduct(ctx);
-                break;
-            case 'powerup':
-                this.drawPowerUp(ctx);
-                break;
+        if (this.type === 'powerup') {
+            this.drawPowerUp(ctx);
+        } else {
+            this.drawProductImage(ctx, imageLoader);
         }
 
         ctx.restore();
+    }
+
+    drawProductImage(ctx, imageLoader) {
+        const image = imageLoader.getImage(this.productConfig.image);
+        
+        if (image) {
+            // Draw the actual product image
+            ctx.drawImage(
+                image,
+                -this.width/2,
+                -this.height/2,
+                this.width,
+                this.height
+            );
+            
+            // Add special effects for golden items
+            if (this.type === 'golden') {
+                this.addGoldenEffect(ctx);
+            }
+        } else {
+            // Fallback to colored rectangle if image fails
+            this.drawFallbackProduct(ctx);
+        }
+    }
+
+    addGoldenEffect(ctx) {
+        // Golden glow effect
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 15;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-this.width/2, -this.height/2, this.width, this.height);
+        
+        // Sparkle effect
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.8)';
+        const sparkles = [
+            [-this.width/3, -this.height/3],
+            [this.width/4, -this.height/4],
+            [-this.width/4, this.height/4],
+            [this.width/3, this.height/3]
+        ];
+        sparkles.forEach(([sx, sy]) => {
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    drawFallbackProduct(ctx) {
+        // Fallback colored rectangle based on product type
+        const colors = {
+            'normal': '#DC143C',
+            'premium': '#8B0000',
+            'golden': '#FFD700'
+        };
+        
+        ctx.fillStyle = colors[this.type] || '#DC143C';
+        ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+        
+        // Product name
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 8px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.productConfig.id.slice(0, 8), 0, 0);
     }
 
     drawNormalCan(ctx) {
@@ -265,9 +329,27 @@ class FallingItem {
         const playerBounds = player.getBounds();
         const itemBounds = this.getBounds();
 
-        return itemBounds.x < playerBounds.x + playerBounds.width &&
-               itemBounds.x + itemBounds.width > playerBounds.x &&
-               itemBounds.y < playerBounds.y + playerBounds.height &&
-               itemBounds.y + itemBounds.height > playerBounds.y;
+        // Add collision margin to require more overlap (less sensitive)
+        const margin = 20; // Pixels of required overlap
+        
+        // Item needs to overlap significantly with player
+        const overlapX = Math.max(0, Math.min(
+            itemBounds.x + itemBounds.width - margin,
+            playerBounds.x + playerBounds.width
+        ) - Math.max(
+            itemBounds.x + margin,
+            playerBounds.x
+        ));
+        
+        const overlapY = Math.max(0, Math.min(
+            itemBounds.y + itemBounds.height - margin,
+            playerBounds.y + playerBounds.height
+        ) - Math.max(
+            itemBounds.y + margin,
+            playerBounds.y
+        ));
+
+        // Require both X and Y overlap for collision
+        return overlapX > 0 && overlapY > 0;
     }
 }

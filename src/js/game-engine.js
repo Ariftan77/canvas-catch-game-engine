@@ -216,15 +216,97 @@ class InputManager {
     }
 }
 
+// Image Loading System
+class ImageLoader {
+    constructor() {
+        this.images = {};
+        this.loadingPromises = [];
+        this.basePath = 'assets/images/';
+    }
+
+    async loadProductImages() {
+        // Load all 14 product images + player icon
+        const productImages = PRODUCT_CONFIG.products.map(product => product.image);
+        const allImages = [...productImages, 'naraya_icon.png'];
+        
+        for (const imageName of allImages) {
+            const promise = this.loadImage(imageName);
+            this.loadingPromises.push(promise);
+        }
+
+        try {
+            await Promise.all(this.loadingPromises);
+            console.log('All images loaded successfully (products + player icon)');
+            return true;
+        } catch (error) {
+            console.error('Failed to load some images:', error);
+            return false;
+        }
+    }
+
+    loadImage(imageName) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const fullPath = this.basePath + imageName;
+            
+            img.onload = () => {
+                console.log(`✅ Successfully loaded: ${imageName}`);
+                this.images[imageName] = img;
+                resolve(img);
+            };
+            img.onerror = (error) => {
+                console.warn(`❌ Failed to load image: ${fullPath}`, error);
+                // Create fallback colored rectangle
+                this.createFallbackImage(imageName);
+                resolve(null);
+            };
+            
+            console.log(`🔄 Loading image: ${fullPath}`);
+            img.src = fullPath;
+        });
+    }
+
+    createFallbackImage(imageName) {
+        // Create a canvas-based fallback image
+        const canvas = document.createElement('canvas');
+        canvas.width = 40;
+        canvas.height = 60;
+        const ctx = canvas.getContext('2d');
+        
+        // Different colors for different products
+        const colors = ['#DC143C', '#FFD700', '#4169E1', '#32CD32', '#FF69B4'];
+        const colorIndex = imageName.length % colors.length;
+        
+        ctx.fillStyle = colors[colorIndex];
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '8px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(imageName.slice(0, 8), canvas.width/2, canvas.height/2);
+        
+        this.images[imageName] = canvas;
+    }
+
+    getImage(imageName) {
+        return this.images[imageName] || null;
+    }
+}
+
 // Main Game Engine
 class NarayaRainGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
+        
+        // Set canvas to full viewport size
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+        
         this.gameState = new GameState();
         this.input = new InputManager();
         this.audio = new AudioManager();
         this.particles = new ParticleSystem();
+        this.imageLoader = new ImageLoader();
         
         this.player = new Player(this.canvas);
         this.itemPool = new ObjectPool(
@@ -235,9 +317,54 @@ class NarayaRainGame {
         this.lastSpawnTime = 0;
         this.lastFrameTime = 0;
         this.animationId = null;
+        this.imagesLoaded = false;
         
         this.setupMouseControl();
         this.loadLeaderboard();
+        this.initializeImages();
+    }
+
+    resizeCanvas() {
+        // Set canvas size to match CSS size for crisp rendering
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+        
+        // Update player position if it exists
+        if (this.player) {
+            this.player.canvas = this.canvas;
+            this.player.x = Math.min(this.player.x, this.canvas.width - this.player.width);
+        }
+        
+        console.log(`Canvas resized to: ${this.canvas.width}x${this.canvas.height}`);
+    }
+
+    async initializeImages() {
+        const loadingText = document.getElementById('loadingText') || this.createLoadingElement();
+        loadingText.style.display = 'block';
+        loadingText.textContent = 'Loading Naraya products...';
+
+        const success = await this.imageLoader.loadProductImages();
+        this.imagesLoaded = success;
+
+        loadingText.style.display = 'none';
+        console.log(`Image loading ${success ? 'completed' : 'completed with fallbacks'}`);
+    }
+
+    createLoadingElement() {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loadingText';
+        loadingDiv.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 1000;
+        `;
+        document.body.appendChild(loadingDiv);
+        return loadingDiv;
     }
 
     setupMouseControl() {
@@ -339,7 +466,7 @@ class NarayaRainGame {
 
         switch (item.type) {
             case 'normal':
-                points = CONFIG.SCORING.NORMAL_CAN;
+                points = item.productConfig ? item.productConfig.points : 10;
                 comboHit = true;
                 this.gameState.statistics.cansHit++;
                 this.audio.play('catch');
@@ -350,8 +477,20 @@ class NarayaRainGame {
                 );
                 break;
 
+            case 'premium':
+                points = item.productConfig ? item.productConfig.points : 25;
+                comboHit = true;
+                this.gameState.statistics.cansHit++;
+                this.audio.play('catch');
+                this.particles.createExplosion(
+                    item.x + item.width/2, 
+                    item.y + item.height/2, 
+                    '#FF69B4', 8
+                );
+                break;
+
             case 'golden':
-                points = CONFIG.SCORING.GOLDEN_CAN;
+                points = item.productConfig ? item.productConfig.points : 50;
                 comboHit = true;
                 this.gameState.statistics.goldenCansHit++;
                 this.audio.play('goldenCatch');
@@ -359,18 +498,6 @@ class NarayaRainGame {
                     item.x + item.width/2, 
                     item.y + item.height/2, 
                     '#FFD700', 12
-                );
-                break;
-
-            case 'competitor':
-                points = CONFIG.SCORING.COMPETITOR_PENALTY;
-                comboHit = false;
-                this.gameState.statistics.competitorHits++;
-                this.audio.play('miss');
-                this.particles.createExplosion(
-                    item.x + item.width/2, 
-                    item.y + item.height/2, 
-                    '#FF0000', 8
                 );
                 break;
 
@@ -403,10 +530,10 @@ class NarayaRainGame {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Draw game objects
-        this.player.draw(this.ctx);
+        this.player.draw(this.ctx, this.imageLoader);
         
         this.itemPool.getActiveObjects().forEach(item => {
-            item.draw(this.ctx);
+            item.draw(this.ctx, this.imageLoader);
         });
 
         this.particles.draw(this.ctx);
@@ -509,6 +636,32 @@ function startGame() {
     if (!game) {
         game = new NarayaRainGame();
     }
+    
+    // Check if images are loaded before starting
+    if (!game.imagesLoaded) {
+        console.log('⏳ Images still loading, please wait...');
+        
+        // Show loading message
+        const startBtn = document.querySelector('.start-content .btn');
+        const originalText = startBtn.textContent;
+        startBtn.textContent = 'LOADING IMAGES...';
+        startBtn.disabled = true;
+        
+        // Check again in 1 second
+        setTimeout(() => {
+            startBtn.textContent = originalText;
+            startBtn.disabled = false;
+            if (game.imagesLoaded) {
+                game.start();
+            } else {
+                console.log('⚠️ Images failed to load, using fallbacks');
+                game.start(); // Start anyway with fallbacks
+            }
+        }, 1000);
+        
+        return;
+    }
+    
     game.start();
 }
 
