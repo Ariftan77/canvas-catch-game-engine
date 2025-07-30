@@ -1,0 +1,71 @@
+# Electron Build Outputs - EXCLUDE from Git
+dist/
+build/
+out/
+*.exe
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+*.zip
+*.tar.gz
+
+# Node.js Dependencies - EXCLUDE from Git  
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Electron Cache and Temp Files - EXCLUDE from Git
+.electron-gyp/
+.cache/
+.tmp/
+temp/
+*.tmp
+*.temp
+
+# OS Generated Files - EXCLUDE from Git
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE Files - EXCLUDE from Git
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs - EXCLUDE from Git
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Test Coverage - EXCLUDE from Git
+coverage/
+.coverage/
+.nyc_output/
+
+# Environment Files - EXCLUDE from Git (if you add any)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary Icon Files - EXCLUDE from Git
+electron/icon-*.png
+
+# Debug Files - EXCLUDE from Git
+test-*.html
+debug-*.html
