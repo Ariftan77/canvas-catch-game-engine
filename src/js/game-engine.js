@@ -225,9 +225,9 @@ class ImageLoader {
     }
 
     async loadProductImages() {
-        // Load all 14 product images + player icon
+        // Load all 14 product images + player bucket images
         const productImages = PRODUCT_CONFIG.products.map(product => product.image);
-        const allImages = [...productImages, 'naraya_icon.png'];
+        const allImages = [...productImages, 'naraya_bucket.png', 'naraya_bucket_300.png'];
         
         for (const imageName of allImages) {
             const promise = this.loadImage(imageName);
@@ -236,7 +236,7 @@ class ImageLoader {
 
         try {
             await Promise.all(this.loadingPromises);
-            console.log('All images loaded successfully (products + player icon)');
+            console.log('All images loaded successfully (products + player bucket images)');
             return true;
         } catch (error) {
             console.error('Failed to load some images:', error);
@@ -330,10 +330,12 @@ class NarayaRainGame {
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
         
-        // Update player position if it exists
+        // Update player position and size if it exists
         if (this.player) {
             this.player.canvas = this.canvas;
+            this.player.updateSize();
             this.player.x = Math.min(this.player.x, this.canvas.width - this.player.width);
+            this.player.y = this.canvas.height - this.player.height - 20;
         }
         
         console.log(`Canvas resized to: ${this.canvas.width}x${this.canvas.height}`);
@@ -368,12 +370,34 @@ class NarayaRainGame {
     }
 
     setupMouseControl() {
+        // Mouse control
         this.canvas.addEventListener('mousemove', (e) => {
             if (!this.gameState.isPlaying) return;
             
             const rect = this.canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             this.player.targetX = mouseX - this.player.width / 2;
+        });
+
+        // Touch control for mobile
+        this.canvas.addEventListener('touchmove', (e) => {
+            if (!this.gameState.isPlaying) return;
+            e.preventDefault(); // Prevent scrolling
+            
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const touchX = touch.clientX - rect.left;
+            this.player.targetX = touchX - this.player.width / 2;
+        });
+
+        this.canvas.addEventListener('touchstart', (e) => {
+            if (!this.gameState.isPlaying) return;
+            e.preventDefault(); // Prevent scrolling
+            
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const touchX = touch.clientX - rect.left;
+            this.player.targetX = touchX - this.player.width / 2;
         });
     }
 
@@ -434,7 +458,7 @@ class NarayaRainGame {
         if (currentTimeMs - this.lastSpawnTime > 1000 / (CONFIG.ITEM_SPAWN_RATE * 60)) {
             if (Math.random() < CONFIG.ITEM_SPAWN_RATE) {
                 const item = this.itemPool.get();
-                item.spawn(this.canvas.width);
+                item.spawn(this.canvas.width, this.canvas.height);
                 this.lastSpawnTime = currentTimeMs;
             }
         }

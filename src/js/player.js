@@ -2,12 +2,31 @@
 class Player {
     constructor(canvas) {
         this.canvas = canvas;
-        this.width = 120;  // Larger to show the Naraya icon better
-        this.height = 120; // Square to maintain icon proportions
+        this.updateSize();
         this.x = canvas.width / 2 - this.width / 2;
         this.y = canvas.height - this.height - 20;
         this.speed = CONFIG.PLAYER_SPEED;
         this.targetX = this.x;
+    }
+
+    updateSize() {
+        // Responsive sizing based on screen dimensions (10% smaller than before)
+        const isVertical = this.canvas.height > this.canvas.width;
+        const isMobile = this.canvas.width < 768;
+        
+        if (isVertical && isMobile) {
+            // Mobile portrait - smaller bucket (was 80, now 72)
+            this.width = 72;
+            this.height = 72;
+        } else if (isMobile) {
+            // Mobile landscape - medium bucket (was 100, now 90)
+            this.width = 90;
+            this.height = 90;
+        } else {
+            // Desktop - full size bucket (was 120, now 108)
+            this.width = 108;
+            this.height = 108;
+        }
     }
 
     update(input) {
@@ -44,8 +63,10 @@ class Player {
         ctx.shadowBlur = 5;
         ctx.shadowOffsetY = 3;
 
-        // Try to get the naraya icon image
-        const iconImage = imageLoader ? imageLoader.getImage('naraya_icon.png') : null;
+        // Try to get the naraya bucket image based on score
+        const currentScore = game && game.gameState ? game.gameState.score : 0;
+        const bucketImage = currentScore >= 300 ? 'naraya_bucket_300.png' : 'naraya_bucket.png';
+        const iconImage = imageLoader ? imageLoader.getImage(bucketImage) : null;
         
         if (iconImage) {
             // Draw the Naraya icon as the player

@@ -17,16 +17,45 @@ class FallingItem {
         this.active = true;
     }
 
-    spawn(canvasWidth) {
+    getResponsiveDimensions(canvasWidth, canvasHeight) {
+        // Base dimensions from product config
+        const baseWidth = this.productConfig?.width || 40;
+        const baseHeight = this.productConfig?.height || 60;
+        
+        // Scale items to match bucket scaling for consistent gameplay
+        const isVertical = canvasHeight > canvasWidth;
+        const isMobile = canvasWidth < 768;
+        
+        let scaleFactor = 1.0;
+        
+        if (isVertical && isMobile) {
+            // Mobile portrait - scale down to match 72px bucket (was 108px on desktop)
+            scaleFactor = 72 / 108; // ~0.67
+        } else if (isMobile) {
+            // Mobile landscape - scale down to match 90px bucket
+            scaleFactor = 90 / 108; // ~0.83
+        } else {
+            // Desktop - full size (108px bucket)
+            scaleFactor = 1.0;
+        }
+        
+        return {
+            width: Math.round(baseWidth * scaleFactor),
+            height: Math.round(baseHeight * scaleFactor)
+        };
+    }
+
+    spawn(canvasWidth, canvasHeight) {
         this.active = true;
         
         // Get random product from weighted configuration
         this.productConfig = PRODUCT_CONFIG.getRandomProduct();
         this.type = this.productConfig.type;
         
-        // Set dimensions from product config
-        this.width = this.productConfig.width || 40;
-        this.height = this.productConfig.height || 60;
+        // Set responsive dimensions based on screen size
+        const responsiveDimensions = this.getResponsiveDimensions(canvasWidth, canvasHeight);
+        this.width = responsiveDimensions.width;
+        this.height = responsiveDimensions.height;
         
         // Position randomly across canvas width
         this.x = Math.random() * (canvasWidth - this.width);
@@ -148,9 +177,10 @@ class FallingItem {
         ctx.fillStyle = colors[this.type] || '#DC143C';
         ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
         
-        // Product name
+        // Product name - responsive font size
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 8px Arial';
+        const fontSize = Math.max(6, Math.min(8, this.width * 0.2));
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText(this.productConfig.id.slice(0, 8), 0, 0);
     }
@@ -170,9 +200,10 @@ class FallingItem {
         ctx.fillRect(-this.width/2, -this.height/2, this.width, 8);
         ctx.fillRect(-this.width/2, this.height/2 - 8, this.width, 8);
 
-        // Naraya label
+        // Naraya label - responsive font size
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 10px Arial';
+        const fontSize = Math.max(6, Math.min(10, this.width * 0.25));
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText('NARAYA', 0, -5);
         ctx.fillText('DRINK', 0, 8);
@@ -199,9 +230,10 @@ class FallingItem {
             ctx.fill();
         });
 
-        // Golden label
+        // Golden label - responsive font size
         ctx.fillStyle = '#8B0000';
-        ctx.font = 'bold 9px Arial';
+        const fontSize = Math.max(6, Math.min(9, this.width * 0.225));
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText('GOLDEN', 0, -5);
         ctx.fillText('NARAYA', 0, 8);
@@ -223,7 +255,8 @@ class FallingItem {
         ctx.stroke();
 
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 8px Arial';
+        const fontSize = Math.max(6, Math.min(8, this.width * 0.2));
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText('AVOID', 0, 0);
     }
@@ -241,8 +274,9 @@ class FallingItem {
             ctx.arc(0, 0, this.width/2, 0, Math.PI * 2);
             ctx.fill();
 
-            // 3D effect for "2X" text
-            ctx.font = 'bold 18px Arial';
+            // 3D effect for "2X" text - responsive font size
+            const fontSize = Math.max(12, Math.min(18, this.width * 0.45));
+            ctx.font = `bold ${fontSize}px Arial`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -329,8 +363,8 @@ class FallingItem {
         const playerBounds = player.getBounds();
         const itemBounds = this.getBounds();
 
-        // Add collision margin to require more overlap (less sensitive)
-        const margin = 20; // Pixels of required overlap
+        // Responsive collision margin based on item size
+        const margin = Math.max(10, Math.min(20, this.width * 0.3)); // 30% of width, clamped between 10-20px
         
         // Item needs to overlap significantly with player
         const overlapX = Math.max(0, Math.min(
