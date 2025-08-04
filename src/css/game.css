@@ -1,3 +1,15 @@
+/* CSS Custom Properties for Theme System */
+:root {
+    --theme-primary: #DC143C;
+    --theme-secondary: #8B0000;
+    --theme-accent: #FFD700;
+    --theme-background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    --theme-game-background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
+    --theme-text: #FFFFFF;
+    --theme-button: #FFD700;
+    --theme-button-text: #8B0000;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,10 +18,11 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
-    color: white;
+    background: var(--theme-background);
+    color: var(--theme-text);
     overflow: hidden;
     user-select: none;
+    transition: all 0.3s ease;
 }
 
 .game-container {
@@ -37,47 +50,54 @@ body {
     width: 100vw;
     height: calc(100vh - 80px);
     border: none;
-    background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
+    background: var(--theme-game-background);
     display: block;
+    transition: background 0.3s ease;
 }
 
 .score-panel {
     background: rgba(0,0,0,0.8);
     padding: 15px 20px;
     border-radius: 10px;
-    border: 2px solid #FFD700;
+    border: 2px solid var(--theme-accent);
+    transition: border-color 0.3s ease;
 }
 
 .score-panel h3 {
-    color: #FFD700;
+    color: var(--theme-accent);
     margin-bottom: 5px;
     font-size: 14px;
+    transition: color 0.3s ease;
 }
 
 .score-value {
     font-size: 24px;
     font-weight: bold;
-    color: white;
+    color: var(--theme-text);
+    transition: color 0.3s ease;
 }
 
 .timer-panel {
-    background: rgba(220, 20, 60, 0.9);
+    background: rgba(0,0,0,0.8);
     padding: 15px 20px;
     border-radius: 10px;
-    border: 2px solid #FFD700;
+    border: 2px solid var(--theme-accent);
     text-align: center;
+    transition: all 0.3s ease;
 }
 
 .timer-panel h3 {
     font-size: 14px;
     margin-bottom: 5px;
-    color: white;
+    color: var(--theme-text);
+    transition: color 0.3s ease;
 }
 
 .timer-value {
     font-size: 28px;
     font-weight: bold;
-    color: white;
+    color: var(--theme-text);
+    transition: color 0.3s ease;
 }
 
 .game-over-screen {
@@ -122,8 +142,8 @@ body {
 }
 
 .btn {
-    background: #FFD700;
-    color: #8B0000;
+    background: var(--theme-button);
+    color: var(--theme-button-text);
     border: none;
     padding: 15px 30px;
     font-size: 18px;
@@ -166,16 +186,18 @@ body {
 
 .game-title {
     font-size: 48px;
-    color: #FFD700;
+    color: var(--theme-accent);
     margin-bottom: 20px;
     text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+    transition: color 0.3s ease;
 }
 
 .game-subtitle {
     font-size: 24px;
-    color: #DC143C;
+    color: var(--theme-primary);
     margin-bottom: 30px;
     font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 .instructions {
@@ -339,7 +361,15 @@ body {
 }
 
 @media (max-width: 768px) {
-    .game-title { font-size: 36px; }
+    .game-title { 
+        font-size: 36px; 
+        margin-top: 10px; /* Add space when theme selector moves above */
+    }
+    
+    .start-content {
+        padding-top: 20px; /* Accommodate theme selector */
+    }
+    
     .ui-overlay { 
         flex-direction: column; 
         align-items: center; 
@@ -429,12 +459,28 @@ body {
         font-size: 12px;
         padding: 6px 0;
     }
+    
+    /* Anniversary badge mobile positioning */
+    .theme-indonesia-80::before {
+        bottom: 80px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
 }
 
 /* Very small screens */
 @media (max-width: 480px) {
-    .game-title { font-size: 28px; }
+    .game-title { 
+        font-size: 28px; 
+        margin-top: 15px; /* More space on very small screens */
+    }
     .game-subtitle { font-size: 18px; }
+    
+    .start-content {
+        padding-top: 25px; /* More accommodation for theme selector */
+    }
     
     .ui-header {
         padding: 8px;
@@ -474,4 +520,307 @@ body {
         font-size: 11px;
         padding: 4px 0;
     }
+}
+
+/* ========================================= */
+/*           THEME-SPECIFIC STYLES          */
+/* ========================================= */
+
+/* Grand Opening Theme - Premium & Sophisticated */
+.theme-grand-opening {
+    --theme-primary: #DC143C;      /* Naraya brand red */
+    --theme-secondary: #1A1A2E;    /* Deep navy */
+    --theme-accent: #D4AF37;       /* Champagne gold */
+    --theme-background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F1419 100%);
+    --theme-game-background: linear-gradient(180deg, #2C3E50 0%, #34495E 50%, #2C3E50 100%);
+    --theme-text: #F8F9FA;         /* Pure white text */
+    --theme-button: #DC143C;       /* Naraya red buttons */
+    --theme-button-text: #FFFFFF;  /* White button text */
+}
+
+.theme-grand-opening .game-title {
+    animation: premiumGlow 3s ease-in-out infinite alternate;
+    background: linear-gradient(45deg, #D4AF37, #FFD700, #D4AF37);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.theme-grand-opening .game-subtitle {
+    color: var(--theme-accent);
+    animation: subtleGlow 2s ease-in-out infinite alternate;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.theme-grand-opening .btn {
+    background: var(--theme-button);
+    color: var(--theme-button-text);
+    border: 2px solid var(--theme-accent);
+    box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-grand-opening .btn:hover {
+    background: var(--theme-accent);
+    color: var(--theme-secondary);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+    border-color: #FFD700;
+}
+
+.theme-grand-opening .ui-header {
+    background: rgba(26, 26, 46, 0.85);
+    border-bottom: 3px solid var(--theme-accent);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.theme-grand-opening .game-over-content,
+.theme-grand-opening .leaderboard {
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--theme-accent);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.theme-grand-opening .start-content {
+    background: rgba(26, 26, 46, 0.9);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 40px;
+    border: 2px solid var(--theme-accent);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.theme-grand-opening .instructions {
+    background: rgba(44, 62, 80, 0.3);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* Enhanced readability and accessibility */
+.theme-grand-opening .score-value,
+.theme-grand-opening .timer-value {
+    color: var(--theme-accent);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    font-weight: 700;
+}
+
+.theme-grand-opening .final-score {
+    color: var(--theme-accent);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+.theme-grand-opening .power-up-item {
+    color: var(--theme-accent);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.theme-grand-opening .combo-indicator {
+    color: var(--theme-accent);
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+}
+
+.theme-grand-opening .power-up-indicator {
+    background: rgba(220, 20, 60, 0.95);
+    color: var(--theme-button-text);
+    border: 2px solid var(--theme-accent);
+}
+
+/* Premium visual hierarchy */
+.theme-grand-opening .instructions h3 {
+    color: var(--theme-accent);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Indonesia 80th Independence Theme */
+.theme-indonesia-80 {
+    --theme-primary: #FF0000;
+    --theme-secondary: #FFFFFF;
+    --theme-accent: #FFD700;
+    --theme-background: linear-gradient(180deg, #FF0000 0%, #FFFFFF 50%, #FF0000 100%);
+    --theme-game-background: linear-gradient(180deg, #FF6B6B 0%, #FFFFFF 50%, #FF6B6B 100%);
+    --theme-text: #FFFFFF;
+    --theme-button: #FF0000;
+    --theme-button-text: #FFFFFF;
+}
+
+.theme-indonesia-80 .game-title {
+    animation: patrioticWave 3s ease-in-out infinite;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.theme-indonesia-80 .game-subtitle {
+    color: var(--theme-accent);
+    animation: patrioticGlow 2s ease-in-out infinite alternate;
+}
+
+.theme-indonesia-80 .btn:hover {
+    background: var(--theme-secondary);
+    color: var(--theme-primary);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+}
+
+.theme-indonesia-80 .ui-header {
+    background: linear-gradient(90deg, rgba(255,0,0,0.8) 0%, rgba(255,255,255,0.8) 50%, rgba(255,0,0,0.8) 100%);
+    border-bottom: 3px solid var(--theme-accent);
+}
+
+.theme-indonesia-80 .instructions {
+    background: rgba(255, 0, 0, 0.1);
+    border: 2px solid rgba(255, 215, 0, 0.8);
+}
+
+/* Special Anniversary Badge for Indonesia 80th theme - Repositioned */
+.theme-indonesia-80::before {
+    content: "80";
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #8B0000;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    animation: anniversaryPulse 2s ease-in-out infinite;
+}
+
+/* ========================================= */
+/*              THEME ANIMATIONS             */
+/* ========================================= */
+
+@keyframes premiumGlow {
+    0% { 
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        filter: brightness(1);
+    }
+    100% { 
+        text-shadow: 0 0 40px rgba(212, 175, 55, 0.9), 0 0 60px rgba(255, 215, 0, 0.6);
+        filter: brightness(1.1);
+    }
+}
+
+@keyframes subtleGlow {
+    0% { text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+    100% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.7); }
+}
+
+@keyframes celebrationPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes patrioticWave {
+    0%, 100% { transform: translateY(0px); }
+    25% { transform: translateY(-5px) scale(1.02); }
+    75% { transform: translateY(5px) scale(0.98); }
+}
+
+@keyframes patrioticGlow {
+    0% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+    100% { text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.6); }
+}
+
+@keyframes anniversaryPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+    50% { transform: scale(1.1); box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8); }
+}
+
+/* Theme Selector Styles - Responsive Layout */
+.theme-selector {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Responsive theme selector positioning */
+@media (max-width: 768px) {
+    .theme-selector {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin-bottom: 20px;
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .theme-selector > div:first-child {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .theme-selector {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .theme-selector > div:first-child {
+        font-size: 10px;
+    }
+}
+
+.theme-btn {
+    background: rgba(0,0,0,0.7);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-accent);
+    padding: 8px 15px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 2px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+/* Responsive theme buttons */
+@media (max-width: 768px) {
+    .theme-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+        margin: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .theme-btn {
+        padding: 8px 12px;
+        font-size: 10px;
+        margin: 2px 0;
+        min-width: 120px;
+        text-align: center;
+    }
+}
+
+.theme-btn:hover {
+    background: var(--theme-accent);
+    color: var(--theme-button-text);
+    transform: translateY(-1px);
+}
+
+.theme-btn.active {
+    background: var(--theme-accent);
+    color: var(--theme-button-text);
+    font-weight: bold;
 }

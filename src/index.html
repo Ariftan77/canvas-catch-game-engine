@@ -28,6 +28,13 @@
         <div class="power-up-indicator" id="powerUpIndicator"></div>
 
         <div class="start-screen" id="startScreen">
+            <div class="theme-selector">
+                <div style="margin-bottom: 10px; color: var(--theme-text); font-size: 12px; font-weight: bold;">🎨 THEME:</div>
+                <button class="theme-btn active" onclick="switchToTheme('default')" id="theme-default">Classic</button>
+                <button class="theme-btn" onclick="switchToTheme('grandOpening')" id="theme-grandOpening">Grand Opening</button>
+                <button class="theme-btn" onclick="switchToTheme('indonesia80')" id="theme-indonesia80">🇮🇩 80th Independence</button>
+            </div>
+            
             <div class="start-content">
                 <h1 class="game-title">NARAYA RAIN</h1>
                 <p class="game-subtitle">Catch the Refreshment!</p>
@@ -81,6 +88,7 @@
 
     <!-- JavaScript modules -->
     <script src="js/config.js"></script>
+    <script src="js/theme-manager.js"></script>
     <script src="js/player.js"></script>
     <script src="js/items.js"></script>
     <script src="js/audio.js"></script>

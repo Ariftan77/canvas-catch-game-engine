@@ -322,6 +322,7 @@ class NarayaRainGame {
         this.setupMouseControl();
         this.loadLeaderboard();
         this.initializeImages();
+        this.setupThemeIntegration();
     }
 
     resizeCanvas() {
@@ -399,6 +400,23 @@ class NarayaRainGame {
             const touchX = touch.clientX - rect.left;
             this.player.targetX = touchX - this.player.width / 2;
         });
+    }
+
+    setupThemeIntegration() {
+        // Listen for theme changes
+        document.addEventListener('themeChanged', (event) => {
+            const theme = event.detail.theme;
+            this.particles.updateTheme(theme);
+            this.updateCanvasBackground(theme);
+        });
+    }
+
+    updateCanvasBackground(theme) {
+        // Update canvas background gradient to match theme
+        const canvas = document.getElementById('gameCanvas');
+        if (canvas && theme.colors.gameBackground) {
+            canvas.style.background = theme.colors.gameBackground;
+        }
     }
 
     start() {
@@ -494,10 +512,10 @@ class NarayaRainGame {
                 comboHit = true;
                 this.gameState.statistics.cansHit++;
                 this.audio.play('catch');
-                this.particles.createExplosion(
+                this.particles.createThemedExplosion(
                     item.x + item.width/2, 
                     item.y + item.height/2, 
-                    '#FFD700', 6
+                    6
                 );
                 break;
 
@@ -506,10 +524,10 @@ class NarayaRainGame {
                 comboHit = true;
                 this.gameState.statistics.cansHit++;
                 this.audio.play('catch');
-                this.particles.createExplosion(
+                this.particles.createThemedExplosion(
                     item.x + item.width/2, 
                     item.y + item.height/2, 
-                    '#FF69B4', 8
+                    8
                 );
                 break;
 
@@ -518,10 +536,9 @@ class NarayaRainGame {
                 comboHit = true;
                 this.gameState.statistics.goldenCansHit++;
                 this.audio.play('goldenCatch');
-                this.particles.createExplosion(
+                this.particles.createFireworks(
                     item.x + item.width/2, 
-                    item.y + item.height/2, 
-                    '#FFD700', 12
+                    item.y + item.height/2
                 );
                 break;
 
@@ -531,10 +548,10 @@ class NarayaRainGame {
                     CONFIG.POWER_UPS[item.powerUpType.toUpperCase() + '_DURATION']
                 );
                 this.audio.play('powerUp');
-                this.particles.createExplosion(
+                this.particles.createThemedExplosion(
                     item.x + item.width/2, 
                     item.y + item.height/2, 
-                    '#00FFFF', 10
+                    10
                 );
                 break;
         }
