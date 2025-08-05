@@ -10,22 +10,46 @@ class Player {
     }
 
     updateSize() {
-        // Responsive sizing based on screen dimensions (10% smaller than before)
-        const isVertical = this.canvas.height > this.canvas.width;
-        const isMobile = this.canvas.width < 768;
+        // Check if we're using the specific naraya_bucket.png (2:1 aspect ratio)
+        const currentScore = game && game.gameState ? game.gameState.score : 0;
+        const isNarayaBucket = currentScore < 300; // Uses naraya_bucket.png
         
-        if (isVertical && isMobile) {
-            // Mobile portrait - smaller bucket (was 80, now 72)
-            this.width = 72;
-            this.height = 72;
-        } else if (isMobile) {
-            // Mobile landscape - medium bucket (was 100, now 90)
-            this.width = 90;
-            this.height = 90;
+        if (isNarayaBucket) {
+            // Special sizing for naraya_bucket.png to maintain 2:1 aspect ratio
+            const isVertical = this.canvas.height > this.canvas.width;
+            const isMobile = this.canvas.width < 768;
+            
+            if (isVertical && isMobile) {
+                // Mobile portrait - maintain 2:1 ratio
+                this.width = 72;
+                this.height = 36;
+            } else if (isMobile) {
+                // Mobile landscape - maintain 2:1 ratio
+                this.width = 90;
+                this.height = 45;
+            } else {
+                // Desktop - maintain 2:1 ratio
+                this.width = 108;
+                this.height = 54;
+            }
         } else {
-            // Desktop - full size bucket (was 120, now 108)
-            this.width = 108;
-            this.height = 108;
+            // Regular responsive sizing for other images (square aspect ratio)
+            const isVertical = this.canvas.height > this.canvas.width;
+            const isMobile = this.canvas.width < 768;
+            
+            if (isVertical && isMobile) {
+                // Mobile portrait - smaller bucket (was 80, now 72)
+                this.width = 72;
+                this.height = 72;
+            } else if (isMobile) {
+                // Mobile landscape - medium bucket (was 100, now 90)
+                this.width = 90;
+                this.height = 90;
+            } else {
+                // Desktop - full size bucket (was 120, now 108)
+                this.width = 108;
+                this.height = 108;
+            }
         }
     }
 
