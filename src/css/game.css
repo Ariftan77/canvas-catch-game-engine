@@ -338,6 +338,10 @@ body {
     margin-top: 10px;
     font-size: 12px;
     line-height: 1.4;
+    min-height: 32px; /* Reserve space for 2 lines of power-ups */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .power-up-item {
@@ -386,11 +390,12 @@ body {
     /* Mobile-specific UI adjustments */
     .ui-header {
         padding: 10px 15px;
-        min-height: 60px;
+        min-height: 95px; /* Increased to accommodate power-up space */
+        height: 95px; /* Fixed height to prevent expansion */
     }
     
     #gameCanvas {
-        height: calc(100vh - 60px);
+        height: calc(100vh - 95px);
     }
     
     .score-panel, .timer-panel {
@@ -409,19 +414,27 @@ body {
     .final-score {
         font-size: 36px;
     }
+    
+    .power-ups-display {
+        margin-top: 6px;
+        font-size: 11px;
+        line-height: 1.3;
+        min-height: 26px; /* Reserve space for mobile */
+    }
 }
 
 /* Portrait mode adjustments */
 @media (max-width: 768px) and (orientation: portrait) {
     .ui-header {
         flex-direction: column;
-        gap: 10px;
-        padding: 10px;
-        min-height: 100px;
+        gap: 8px;
+        padding: 8px 10px;
+        min-height: 85px;
+        height: 85px;
     }
     
     #gameCanvas {
-        height: calc(100vh - 100px);
+        height: calc(100vh - 85px);
     }
     
     .score-panel, .timer-panel {
@@ -437,16 +450,16 @@ body {
     }
     
     .power-up-indicator {
-        top: 120px;
-        padding: 8px 15px;
-        font-size: 14px;
+        top: 95px;
+        padding: 6px 12px;
+        font-size: 13px;
     }
     
     .leaderboard {
         min-width: 280px;
         max-width: 95%;
         width: 95%;
-        max-height: 60vh;
+        max-height: 75vh;
         padding: 15px;
     }
     
@@ -483,8 +496,9 @@ body {
     }
     
     .ui-header {
-        padding: 8px;
-        min-height: 80px;
+        padding: 6px 8px;
+        min-height: 75px;
+        height: 75px;
     }
     
     .score-panel h3, .timer-panel h3 {
@@ -508,7 +522,7 @@ body {
         min-width: 250px;
         max-width: 98%;
         width: 98%;
-        max-height: 70vh;
+        max-height: 80vh;
         padding: 10px;
     }
     
@@ -519,6 +533,13 @@ body {
     .leaderboard-entry {
         font-size: 11px;
         padding: 4px 0;
+    }
+    
+    .power-ups-display {
+        margin-top: 4px;
+        font-size: 10px;
+        line-height: 1.2;
+        min-height: 22px; /* Reserve space for very small screens */
     }
 }
 
@@ -751,33 +772,37 @@ body {
 /* Responsive theme selector positioning */
 @media (max-width: 768px) {
     .theme-selector {
-        position: relative;
-        top: auto;
+        position: absolute;
+        top: 10px;
+        right: 10px;
         left: auto;
-        margin-bottom: 20px;
-        align-items: center;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+        margin-bottom: 0;
+        align-items: flex-end;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 5px;
+        z-index: 600;
     }
     
     .theme-selector > div:first-child {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 5px;
-        font-size: 11px;
+        width: auto;
+        text-align: right;
+        margin-bottom: 3px;
+        font-size: 10px;
     }
 }
 
 @media (max-width: 480px) {
     .theme-selector {
+        top: 8px;
+        right: 8px;
         flex-direction: column;
-        gap: 8px;
+        gap: 4px;
     }
     
     .theme-selector > div:first-child {
-        font-size: 10px;
+        font-size: 9px;
     }
 }
 
@@ -797,18 +822,19 @@ body {
 /* Responsive theme buttons */
 @media (max-width: 768px) {
     .theme-btn {
-        padding: 6px 12px;
-        font-size: 11px;
-        margin: 3px;
+        padding: 4px 8px;
+        font-size: 10px;
+        margin: 1px;
+        min-width: auto;
     }
 }
 
 @media (max-width: 480px) {
     .theme-btn {
-        padding: 8px 12px;
-        font-size: 10px;
-        margin: 2px 0;
-        min-width: 120px;
+        padding: 4px 6px;
+        font-size: 9px;
+        margin: 1px 0;
+        min-width: 80px;
         text-align: center;
     }
 }

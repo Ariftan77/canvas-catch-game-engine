@@ -2,7 +2,7 @@
 const CONFIG = {
     GAME_DURATION: 30000, // 30 seconds
     PLAYER_SPEED: 8,
-    ITEM_SPAWN_RATE: 0.040, // Increased from 0.02 to 0.040 (4%)
+    ITEM_SPAWN_RATE: 0.033, // Reduced from 0.040 to 0.033 (3.3% - ~60 items per game)
     ITEM_FALL_SPEED: 4,
     COMBO_THRESHOLD: 3,
     SCORING: {
