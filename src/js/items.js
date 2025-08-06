@@ -22,20 +22,20 @@ class FallingItem {
         const baseWidth = this.productConfig?.width || 40;
         const baseHeight = this.productConfig?.height || 60;
         
-        // Scale items to match bucket scaling for consistent gameplay
+        // Scale items to match square bucket scaling for consistent gameplay
         const isVertical = canvasHeight > canvasWidth;
         const isMobile = canvasWidth < 768;
         
         let scaleFactor = 1.0;
         
         if (isVertical && isMobile) {
-            // Mobile portrait - scale down to match 72px bucket (was 108px on desktop)
+            // Mobile portrait - scale down to match 72px square bucket
             scaleFactor = 72 / 108; // ~0.67
         } else if (isMobile) {
-            // Mobile landscape - scale down to match 90px bucket
+            // Mobile landscape - scale down to match 90px square bucket  
             scaleFactor = 90 / 108; // ~0.83
         } else {
-            // Desktop - full size (108px bucket)
+            // Desktop - full size to match 108px square bucket
             scaleFactor = 1.0;
         }
         
@@ -86,8 +86,11 @@ class FallingItem {
         this.y += this.speed;
         this.rotation += this.rotationSpeed;
 
-        // Remove if off screen
-        if (this.y > 700) {
+        // Remove if off screen - use dynamic canvas height instead of hardcoded 700
+        const canvas = document.getElementById('gameCanvas');
+        const canvasHeight = canvas ? canvas.height : 700;
+        
+        if (this.y > canvasHeight + 50) { // Add 50px buffer to ensure items reach bottom
             if (this.type === 'normal' || this.type === 'golden' || this.type === 'premium') {
                 gameState.statistics.missedCans++;
                 gameState.updateCombo(false);
@@ -363,27 +366,12 @@ class FallingItem {
         const playerBounds = player.getBounds();
         const itemBounds = this.getBounds();
 
-        // Responsive collision margin based on item size
-        const margin = Math.max(10, Math.min(20, this.width * 0.3)); // 30% of width, clamped between 10-20px
+        // Simple AABB collision detection with minimal tolerance
+        const tolerance = 5; // Fixed 5px tolerance for all screen sizes
         
-        // Item needs to overlap significantly with player
-        const overlapX = Math.max(0, Math.min(
-            itemBounds.x + itemBounds.width - margin,
-            playerBounds.x + playerBounds.width
-        ) - Math.max(
-            itemBounds.x + margin,
-            playerBounds.x
-        ));
-        
-        const overlapY = Math.max(0, Math.min(
-            itemBounds.y + itemBounds.height - margin,
-            playerBounds.y + playerBounds.height
-        ) - Math.max(
-            itemBounds.y + margin,
-            playerBounds.y
-        ));
-
-        // Require both X and Y overlap for collision
-        return overlapX > 0 && overlapY > 0;
+        return (itemBounds.x + tolerance < playerBounds.x + playerBounds.width &&
+                itemBounds.x + itemBounds.width - tolerance > playerBounds.x &&
+                itemBounds.y + tolerance < playerBounds.y + playerBounds.height &&
+                itemBounds.y + itemBounds.height - tolerance > playerBounds.y);
     }
 }

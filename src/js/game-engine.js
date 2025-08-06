@@ -377,7 +377,11 @@ class NarayaRainGame {
             
             const rect = this.canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
-            this.player.targetX = mouseX - this.player.width / 2;
+            
+            // Scale mouse position to canvas coordinates
+            const scaleX = this.canvas.width / rect.width;
+            const scaledMouseX = mouseX * scaleX;
+            this.player.targetX = scaledMouseX - this.player.width / 2;
         });
 
         // Touch control for mobile
@@ -388,7 +392,11 @@ class NarayaRainGame {
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
             const touchX = touch.clientX - rect.left;
-            this.player.targetX = touchX - this.player.width / 2;
+            
+            // Scale touch position to canvas coordinates
+            const scaleX = this.canvas.width / rect.width;
+            const scaledTouchX = touchX * scaleX;
+            this.player.targetX = scaledTouchX - this.player.width / 2;
         });
 
         this.canvas.addEventListener('touchstart', (e) => {
@@ -398,7 +406,11 @@ class NarayaRainGame {
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
             const touchX = touch.clientX - rect.left;
-            this.player.targetX = touchX - this.player.width / 2;
+            
+            // Scale touch position to canvas coordinates
+            const scaleX = this.canvas.width / rect.width;
+            const scaledTouchX = touchX * scaleX;
+            this.player.targetX = scaledTouchX - this.player.width / 2;
         });
     }
 
